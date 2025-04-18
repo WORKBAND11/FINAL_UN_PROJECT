@@ -13,21 +13,15 @@ def get_text_messages(message):
     # Если написали «Привет»
     if message.text == "/start":
         # Пишем приветствие
-        bot.send_message(message.from_user.id, "Приветствую вас в моём первом калькуляторе, написанном на Python!")
+        bot.send_message(message.from_user.id, "Приветствую вас в моём первом, не самом стандартном калькуляторе, написанном на Python!")
         # Готовим кнопки
         keyboard = types.InlineKeyboardMarkup()
         # По очереди готовим текст и обработчик для каждого знака зодиака
-        key_oven = types.InlineKeyboardButton(text='ТРЕУГОЛЬНИК', callback_data='zodiac')
+        key_oven = types.InlineKeyboardButton(text='Математические операции', callback_data='zodiac')
         # И добавляем кнопку на экран
         keyboard.add(key_oven)
-        key_telec = types.InlineKeyboardButton(text='ПРЯМОУГОЛЬНИК И КВАДРАТ', callback_data='zodiac')
+        key_telec = types.InlineKeyboardButton(text='Построение графиков', callback_data='zodiac')
         keyboard.add(key_telec)
-        key_bliznecy = types.InlineKeyboardButton(text='ОКРУЖНОСТЬ', callback_data='zodiac')
-        keyboard.add(key_bliznecy)
-        key_rak = types.InlineKeyboardButton(text='ПРЯМАЯ', callback_data='zodiac')
-        keyboard.add(key_rak)
-        key_lev = types.InlineKeyboardButton(text='УГОЛ', callback_data='zodiac')
-        keyboard.add(key_lev)
 
         # Показываем все кнопки сразу и пишем сообщение о выборе
         bot.send_message(message.from_user.id, text='Выберите, что вы хотите делать:', reply_markup=keyboard)
