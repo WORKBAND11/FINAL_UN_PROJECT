@@ -11,9 +11,9 @@ from telebot import types
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
     # Если написали «Привет»
-    if message.text == "ОЛЕГ":
+    if message.text == "/start":
         # Пишем приветствие
-        bot.send_message(message.from_user.id, "Привет, сейчас я покажу тебе мой католог.")
+        bot.send_message(message.from_user.id, "Приветствую вас в моём первом калькуляторе, написанном на Python!")
         # Готовим кнопки
         keyboard = types.InlineKeyboardMarkup()
         # По очереди готовим текст и обработчик для каждого знака зодиака
@@ -30,11 +30,11 @@ def get_text_messages(message):
         keyboard.add(key_lev)
 
         # Показываем все кнопки сразу и пишем сообщение о выборе
-        bot.send_message(message.from_user.id, text='Выбери свой знак зодиака', reply_markup=keyboard)
+        bot.send_message(message.from_user.id, text='Выберите, что вы хотите делать:', reply_markup=keyboard)
     elif message.text == "/help":
-        bot.send_message(message.from_user.id, "Напиши ОЛЕГ")
+        bot.send_message(message.from_user.id, "Введите /start")
     else:
-        bot.send_message(message.from_user.id, "Я тебя не понимаю. Напиши /help.")
+        bot.send_message(message.from_user.id, "Некоректное сообщение. Напишите /help.")
 # Обработчик нажатий на кнопки
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
