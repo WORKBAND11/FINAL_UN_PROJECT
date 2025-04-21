@@ -1,11 +1,12 @@
 import telebot
 from tokeeen import mytokeen
+
 # Подключаем модуль для Телеграма
-# Указываем токен
 bot = telebot.TeleBot(mytokeen)
+
 # Импортируем типы из модуля, чтобы создавать кнопки
 from telebot import types
-# Заготовки для трёх предложений
+
 
 # Метод, который получает сообщения и обрабатывает их
 @bot.message_handler(content_types=['text'])
@@ -13,30 +14,41 @@ def get_text_messages(message):
     # Если написали «Привет»
     if message.text == "/start":
         # Пишем приветствие
-        bot.send_message(message.from_user.id, "Приветствую вас в моём первом, не самом стандартном калькуляторе, написанном на Python!")
+        bot.send_message(message.from_user.id,
+                         "Приветствую вас в моём первом, не самом стандартном калькуляторе, написанном на Python!")
         # Готовим кнопки
         keyboard = types.InlineKeyboardMarkup()
-        # По очереди готовим текст и обработчик для каждого знака зодиака
-        key_oven = types.InlineKeyboardButton(text='Математические операции', callback_data='zodiac')
-        # И добавляем кнопку на экран
-        keyboard.add(key_oven)
-        key_telec = types.InlineKeyboardButton(text='Построение графиков', callback_data='zodiac')
-        keyboard.add(key_telec)
+        # Кнопка для математических операций
+        key_math = types.InlineKeyboardButton(text='Математические операции', callback_data='math')
+        keyboard.add(key_math)
+        # Кнопка для построения графиков
+        key_geo = types.InlineKeyboardButton(text='Построение графиков', callback_data='geo')
+        keyboard.add(key_geo)
 
         # Показываем все кнопки сразу и пишем сообщение о выборе
         bot.send_message(message.from_user.id, text='Выберите, что вы хотите делать:', reply_markup=keyboard)
     elif message.text == "/help":
         bot.send_message(message.from_user.id, "Введите /start")
     else:
-        bot.send_message(message.from_user.id, "Некоректное сообщение. Напишите /help.")
+        bot.send_message(message.from_user.id, "Некорректное сообщение. Напишите /help.")
+
+
 # Обработчик нажатий на кнопки
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
-    # Если нажали на одну из 12 кнопок — выводим гороскоп
-    if call.data == "zodiac":
-        msg = "ОЛЕГеометрия"
-        bot.send_message(call.message.chat.id, msg)
-    # Запускаем постоянный опрос бота в Телеграме
+    # Если нажали на кнопку "математические операции"
+    if call.data == "math":
+        msg = "Выберите математическую операцию:"
+        keyboard = types.InlineKeyboardMarkup()
+        key_add = types.InlineKeyboardButton(text='Обычные математические выражения',
+                                             callback_data='usuall')
+        key_equation = types.InlineKeyboardButton(text='Уравнения', callback_data='urav')
+        keyboard.add(key_add)
+        keyboard.add(key_equation)
+
+        # Отправляем сообщение с выбором операций
+        bot.send_message(call.from_user.id, msg, reply_markup=keyboard)
 
 
+# Запускаем постоянный опрос бота в Телеграме
 bot.polling(none_stop=True, interval=0)
