@@ -28,7 +28,7 @@ def get_text_messages(message):
         # Показываем все кнопки сразу и пишем сообщение о выборе
         bot.send_message(message.from_user.id, text='Выберите, что вы хотите делать:', reply_markup=keyboard)
     elif message.text == "/help":
-        bot.send_message(message.from_user.id, "Введите /start")
+        bot.send_message(message.from_user.id, "Чтобы перезапустить работу бота, введите /start")
     else:
         bot.send_message(message.from_user.id, "Некорректное сообщение. Напишите /help.")
 
@@ -37,14 +37,19 @@ def get_text_messages(message):
 def callback_worker(call):
     # Если нажали на кнопку "математические операции"
     if call.data == "math":
-        msg = "выберите математическую операцию"
+        msg = "Выберите математическую операцию:"
         keyboard = types.InlineKeyboardMarkup()
         key_add = types.InlineKeyboardButton(text='Обычные математические выражения', callback_data='usuall')
-        key_add = types.InlineKeyboardButton(text='Обычные уравнения', callback_data='usurav')
+        keyboard.add(key_add)  # Добавляем кнопку в клавиатуру
+        key_equation = types.InlineKeyboardButton(text='Обычные уравнения', callback_data='usurav')
+        keyboard.add(key_equation)  # Добавляем кнопку в клавиатуру
+
+        # Отправляем сообщение с выбором операций
+        bot.send_message(call.from_user.id, msg, reply_markup=keyboard)
 
     # Если выбрали "Обычные математические выражения"
     elif call.data == "usuall":
-        bot.send_message(call.from_user.id, "Введите математическое выражение (например, 2 + 2):")
+        bot.send_message(call.from_user.id, "Здесь вводите выражение любой длины. Можно использовать: сложение (n + n), вычитание (n - n), умножение (n * n), деление (n / n), степени (n ** n), корни (sqrt(n), дроби (n / n). После получения ответа снова выберите 'Обычные математические выражение' либо что-то другое. Если этого не сделать и снова вписать выражение, бот выдаст ошибку.)")
         bot.register_next_step_handler(call.message, process_expression)
 
 # Обработка введенного математического выражения
