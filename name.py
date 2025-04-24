@@ -37,19 +37,10 @@ def get_text_messages(message):
 def callback_worker(call):
     # Если нажали на кнопку "математические операции"
     if call.data == "math":
-        msg = "Выберите математическую операцию:"
+        msg = "выберите математическую операцию"
         keyboard = types.InlineKeyboardMarkup()
         key_add = types.InlineKeyboardButton(text='Обычные математические выражения', callback_data='usuall')
-        key_equation = types.InlineKeyboardButton(text='Уравнения', callback_data='urav')
-        key_vieta = types.InlineKeyboardButton(text='Квадратные уравнения (т. Виета)', callback_data='kv_urav')
-        key_system = types.InlineKeyboardButton(text='Система уравнений', callback_data='sys_urav')
-        keyboard.add(key_add)
-        keyboard.add(key_equation)
-        keyboard.add(key_vieta)
-        keyboard.add(key_system)
-
-        # Отправляем сообщение с выбором операций
-        bot.send_message(call.from_user.id, msg, reply_markup=keyboard)
+        key_add = types.InlineKeyboardButton(text='Обычные уравнения', callback_data='usurav')
 
     # Если выбрали "Обычные математические выражения"
     elif call.data == "usuall":
