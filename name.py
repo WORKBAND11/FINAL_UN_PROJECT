@@ -28,7 +28,7 @@ def get_text_messages(message):
         # Показываем все кнопки сразу и пишем сообщение о выборе
         bot.send_message(message.from_user.id, text='Выберите, что вы хотите делать:', reply_markup=keyboard)
     elif message.text == "/help":
-        bot.send_message(message.from_user.id, "Чтобы перезапустить работу бота, введите /start Пишите всё строго по инструкции")
+        bot.send_message(message.from_user.id, "Чтобы перезапустить работу бота, введите /start. Пишите всё строго по инструкции.")
     else:
         bot.send_message(message.from_user.id, "Некорректное сообщение. Напишите /help.")
 
@@ -49,8 +49,13 @@ def callback_worker(call):
 
     # Если выбрали "Обычные математические выражения"
     elif call.data == "usuall":
-        bot.send_message(call.from_user.id, "Здесь вводите выражение любой длины. Можно использовать: сложение (n + n), вычитание (n - n), умножение (n * n), деление (n / n), степени (n ** n), корни (sqrt(n), j,обыкновенные/неправильные дроби (n / n), десятичные дроби (n.n). После получения ответа снова выберите 'Обычные математические выражение' либо что-то другое. Если этого не сделать и снова вписать выражение, бот выдаст ошибку.)")
+        bot.send_message(call.from_user.id, "Здесь вводите выражение любой длины. Можно использовать: сложение (n + n), вычитание (n - n), умножение (n * n), деление (n / n), степени (n ** n), корни (sqrt(n), обыкновенные/неправильные дроби (n / n), десятичные дроби (n.n). После получения ответа снова выберите 'Обычные математические выражения' либо что-то другое. Если этого не сделать и снова вписать выражение, бот выдаст ошибку.")
         bot.register_next_step_handler(call.message, process_expression)
+
+    # Если выбрали "Обычные уравнения"
+    elif call.data == "usurav":
+        bot.send_message(call.from_user.id, "Введите уравнение в формате '2*x + 2 = 4'.")
+        bot.register_next_step_handler(call.message, process_equation)
 
 # Обработка введенного математического выражения
 def process_expression(message):
@@ -59,7 +64,28 @@ def process_expression(message):
         result = sp.sympify(message.text)
         bot.send_message(message.from_user.id, f"Результат: {result}")
     except Exception as e:
-        bot.send_message(message.from_user.id, "Ошибка в выражении. Пожалуйста, попробуйте еще раз.")
+        bot.send_message(message.from_user.id, "Ошибка в вводе выражения. Пожалуйста, попробуйте еще раз.")
+
+
+# Обработка введенного уравнения
+def process_equation(message):
+    try:
+        # Убираем лишние пробелы и проверяем наличие '='
+        equation_text = message.text.replace(" ", "")
+        if '=' not in equation_text:
+            raise ValueError("Уравнение должно содержать знак '='.")
+
+        # Разделяем уравнение на левую и правую части
+        left, right = equation_text.split('=')
+
+        # Преобразуем в символьное уравнение
+        equation = sp.Eq(sp.sympify(left.strip()), sp.sympify(right.strip()))
+
+        # Решаем уравнение
+        solution = sp.solve(equation)
+        bot.send_message(message.from_user.id, f"Решение уравнения: x = {solution}")
+    except Exception as e:
+        bot.send_message(message.from_user.id, "Ошибка в уравнении. Пожалуйста, попробуйте еще раз.")
 
 # Запускаем постоянный опрос бота в Телеграме
 bot.polling(none_stop=True, interval=0)
