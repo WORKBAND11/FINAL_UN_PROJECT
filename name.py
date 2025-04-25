@@ -54,7 +54,7 @@ def callback_worker(call):
 
     # Если выбрали "Обычные уравнения"
     elif call.data == "usurav":
-        bot.send_message(call.from_user.id, "Введите уравнение в формате '2*x + 2 = 4'.")
+        bot.send_message(call.from_user.id, "Введите уравнение в формате '2*x + 2 = 4'. После получения ответа снова выберите 'Обычные уравнения' либо что-то другое. Если этого не сделать и снова вписать уравнение, бот выдаст ошибку")
         bot.register_next_step_handler(call.message, process_equation)
 
 # Обработка введенного математического выражения
@@ -85,7 +85,7 @@ def process_equation(message):
         solution = sp.solve(equation)
         bot.send_message(message.from_user.id, f"Решение уравнения: x = {solution}")
     except Exception as e:
-        bot.send_message(message.from_user.id, "Ошибка в уравнении. Пожалуйста, попробуйте еще раз.")
+        bot.send_message(message.from_user.id, "Ошибка в вводе уравнения. Пожалуйста, попробуйте еще раз.")
 
 # Запускаем постоянный опрос бота в Телеграме
 bot.polling(none_stop=True, interval=0)
