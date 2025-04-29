@@ -1,91 +1,137 @@
 import telebot
 from tokeeen import mytokeen
-import sympy as sp  # Импортируем библиотеку sympy для вычисления математических выражений
+import sympy as sp
+import matplotlib
 
-# Подключаем модуль для Телеграма
+matplotlib.use('Agg')  # Устанавливаем бэкенд для работы без GUI
+import matplotlib.pyplot as plt
+import numpy as np
+
 bot = telebot.TeleBot(mytokeen)
-
-# Импортируем типы из модуля, чтобы создавать кнопки
 from telebot import types
 
-# Метод, который получает сообщения и обрабатывает их
+
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
-    # Если написали «Привет»
     if message.text == "/start":
-        # Пишем приветствие
         bot.send_message(message.from_user.id,
                          "Приветствую вас в моём первом, не самом стандартном калькуляторе, написанном на Python!")
-        # Готовим кнопки
         keyboard = types.InlineKeyboardMarkup()
-        # Кнопка для математических операций
         key_math = types.InlineKeyboardButton(text='Математические операции', callback_data='math')
         keyboard.add(key_math)
-        # Кнопка для построения графиков
         key_geo = types.InlineKeyboardButton(text='Построение графиков', callback_data='geo')
         keyboard.add(key_geo)
-
-        # Показываем все кнопки сразу и пишем сообщение о выборе
         bot.send_message(message.from_user.id, text='Выберите, что вы хотите делать:', reply_markup=keyboard)
     elif message.text == "/help":
-        bot.send_message(message.from_user.id, "Чтобы перезапустить работу бота, введите /start. Пишите всё строго по инструкции.")
+        bot.send_message(message.from_user.id,
+                         "Чтобы перезапустить работу бота, введите /start. Пишите всё строго по инструкции.")
     else:
         bot.send_message(message.from_user.id, "Некорректное сообщение. Напишите /help.")
 
-# Обработчик нажатий на кнопки
+
 @bot.callback_query_handler(func=lambda call: True)
-def callback_worker(call):
-    # Если нажали на кнопку "математические операции"
+def callback_worker(call, process_linear_graph=None, process_quadratic_graph=None):
     if call.data == "math":
         msg = "Выберите математическую операцию:"
         keyboard = types.InlineKeyboardMarkup()
         key_add = types.InlineKeyboardButton(text='Обычные математические выражения', callback_data='usuall')
-        keyboard.add(key_add)  # Добавляем кнопку в клавиатуру
+        keyboard.add(key_add)
         key_equation = types.InlineKeyboardButton(text='Обычные уравнения', callback_data='usurav')
-        keyboard.add(key_equation)  # Добавляем кнопку в клавиатуру
-
-        # Отправляем сообщение с выбором операций
+        keyboard.add(key_equation)
         bot.send_message(call.from_user.id, msg, reply_markup=keyboard)
 
-    # Если выбрали "Обычные математические выражения"
+    elif call.data == "geo":
+        msg = "📊 Выберите тип графика:"
+        keyboard = types.InlineKeyboardMarkup()
+        key_linear = types.InlineKeyboardButton(text='Линейный (y = kx + b)', callback_data='linear_graph')
+        keyboard.add(key_linear)
+        key_quadratic = types.InlineKeyboardButton(text='Квадратичный (y = ax² + bx + c)',
+                                                   callback_data='quadratic_graph')
+        keyboard.add(key_quadratic)
+        bot.send_message(call.from_user.id, msg, reply_markup=keyboard)
+
     elif call.data == "usuall":
-        bot.send_message(call.from_user.id, "Здесь вводите выражение любой длины. Можно использовать: сложение (n + n), вычитание (n - n), умножение (n * n), деление (n / n), степени (n ** n), корни (sqrt(n), обыкновенные/неправильные дроби (n / n), десятичные дроби (n.n). После получения ответа снова выберите 'Обычные математические выражения' либо что-то другое. Если этого не сделать и снова вписать выражение, бот выдаст ошибку.")
+        bot.send_message(call.from_user.id, "Введите математическое выражение...")
         bot.register_next_step_handler(call.message, process_expression)
 
-    # Если выбрали "Обычные уравнения"
     elif call.data == "usurav":
-        bot.send_message(call.from_user.id, "Введите уравнение в формате '2*x + 2 = 4'. После получения ответа снова выберите 'Обычные уравнения' либо что-то другое. Если этого не сделать и снова вписать уравнение, бот выдаст ошибку")
+        bot.send_message(call.from_user.id, "Введите уравнение в формате '2*x + 2 = 4'...")
         bot.register_next_step_handler(call.message, process_equation)
 
-# Обработка введенного математического выражения
+    elif call.data == "linear_graph":
+        bot.send_message(call.from_user.id, "Введите коэффициенты k и b через пробел (пример: '2 3'):")
+        bot.register_next_step_handler(call.message, process_linear_graph)
+
+    elif call.data == "quadratic_graph":
+        bot.send_message(call.from_user.id, "Введите коэффициенты a, b, c через пробел (пример: '1 -2 1'):")
+        bot.register_next_step_handler(call.message, process_quadratic_graph)
+
+
 def process_expression(message):
     try:
-        # Используем sympy для вычисления выражения
         result = sp.sympify(message.text)
         bot.send_message(message.from_user.id, f"Результат: {result}")
     except Exception as e:
-        bot.send_message(message.from_user.id, "Ошибка в вводе выражения. Пожалуйста, попробуйте еще раз.")
+        bot.send_message(message.from_user.id, "Ошибка в вводе выражения.")
 
 
-# Обработка введенного уравнения
 def process_equation(message):
     try:
-        # Убираем лишние пробелы и проверяем наличие '='
         equation_text = message.text.replace(" ", "")
         if '=' not in equation_text:
-            raise ValueError("Уравнение должно содержать знак '='.")
-
-        # Разделяем уравнение на левую и правую части
+            raise ValueError("Отсутствует знак '='.")
         left, right = equation_text.split('=')
-
-        # Преобразуем в символьное уравнение
-        equation = sp.Eq(sp.sympify(left.strip()), sp.sympify(right.strip()))
-
-        # Решаем уравнение
+        equation = sp.Eq(sp.sympify(left), sp.sympify(right))
         solution = sp.solve(equation)
-        bot.send_message(message.from_user.id, f"Решение уравнения: x = {solution}")
+        bot.send_message(message.from_user.id, f"Решение: x = {solution}")
     except Exception as e:
-        bot.send_message(message.from_user.id, "Ошибка в вводе уравнения. Пожалуйста, попробуйте еще раз.")
+        bot.send_message(message.from_user.id, "Ошибка в вводе уравнения.")
 
-# Запускаем постоянный опрос бота в Телеграме
+
+def process_linear_graph(message):
+    try:
+        k, b = map(float, message.text.split())
+        x = np.linspace(-10, 10, 400)
+        y = k * x + b
+
+        plt.figure()
+        plt.plot(x, y, label=f'y = {k}x + {b}')
+        plt.title("Линейный график")
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.grid(True)
+        plt.legend()
+
+        plt.savefig('graph.png')
+        plt.close()
+
+        with open('graph.png', 'rb') as photo:
+            bot.send_photo(message.chat.id, photo)
+    except Exception as e:
+        bot.send_message(message.chat.id, f"Ошибка: {e}. Введите два числа через пробел.")
+
+
+def process_quadratic_graph(message):
+    try:
+        a, b, c = map(float, message.text.split())
+        x = np.linspace(-10, 10, 400)
+        y = a * x ** 2 + b * x + c
+
+        plt.figure()
+        plt.plot(x, y, label=f'y = {a}x² + {b}x + {c}')
+        plt.title("Квадратичный график")
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.grid(True)
+        plt.legend()
+
+        plt.savefig('graph.png')
+        plt.close()
+
+        with open('graph.png', 'rb') as photo:
+            bot.send_photo(message.chat.id, photo)
+    except Exception as e:
+        bot.send_message(message.chat.id, f"Ошибка: {e}. Введите три числа через пробел.")
+
+
 bot.polling(none_stop=True, interval=0)
