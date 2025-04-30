@@ -136,4 +136,5 @@ def process_quadratic_graph(message):
     except Exception as e:
         bot.send_message(message.chat.id, f"Произошла ошибка: {e}. Попробуйте снова.")
 
+
 bot.polling(none_stop=True, interval=0)
