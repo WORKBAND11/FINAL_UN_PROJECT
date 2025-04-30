@@ -30,7 +30,7 @@ def get_text_messages(message):
 
 
 @bot.callback_query_handler(func=lambda call: True)
-def callback_worker(call, process_linear_graph=None, process_quadratic_graph=None):
+def callback_worker(call):
     if call.data == "math":
         msg = "Выберите математическую операцию:"
         keyboard = types.InlineKeyboardMarkup()
@@ -86,8 +86,6 @@ def process_equation(message):
         bot.send_message(message.from_user.id, f"Решение: x = {solution}")
     except Exception as e:
         bot.send_message(message.from_user.id, "Ошибка в вводе уравнения.")
-
-
 def process_linear_graph(message):
     try:
         k, b = map(float, message.text.split())
@@ -107,12 +105,15 @@ def process_linear_graph(message):
 
         with open('graph.png', 'rb') as photo:
             bot.send_photo(message.chat.id, photo)
+    except ValueError:
+        bot.send_message(message.chat.id, "Ошибка: Убедитесь, что вы ввели два числа через пробел.")
     except Exception as e:
-        bot.send_message(message.chat.id, f"Ошибка: {e}. Введите два числа через пробел.")
+        bot.send_message(message.chat.id, f"Произошла ошибка: {e}. Попробуйте снова.")
 
 
 def process_quadratic_graph(message):
     try:
+        # Разделяем входное сообщение на коэффициенты a, b и c
         a, b, c = map(float, message.text.split())
         x = np.linspace(-10, 10, 400)
         y = a * x ** 2 + b * x + c
@@ -130,8 +131,9 @@ def process_quadratic_graph(message):
 
         with open('graph.png', 'rb') as photo:
             bot.send_photo(message.chat.id, photo)
+    except ValueError:
+        bot.send_message(message.chat.id, "Ошибка: Убедитесь, что вы ввели три числа через пробел.")
     except Exception as e:
-        bot.send_message(message.chat.id, f"Ошибка: {e}. Введите три числа через пробел.")
-
+        bot.send_message(message.chat.id, f"Произошла ошибка: {e}. Попробуйте снова.")
 
 bot.polling(none_stop=True, interval=0)
