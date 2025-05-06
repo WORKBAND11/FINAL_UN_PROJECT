@@ -39,7 +39,8 @@
 1) Построение линейного графика:
 
 
-![image](https://github.com/user-attachments/assets/f40ae4c1-73f5-4884-80d9-96d3f78c0ca2)
+![image](https://github.com/user-attachments/assets/a5b6a58d-ccf9-476e-a4c6-fca7625125f9)
+
 
 2) Построение квадратичного графика:
 
