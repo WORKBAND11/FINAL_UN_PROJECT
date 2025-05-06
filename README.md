@@ -45,7 +45,8 @@
 2) Построение квадратичного графика:
 
 
-![image](https://github.com/user-attachments/assets/08570d48-3d1a-4705-8f52-11e3acc42769)
+![image](https://github.com/user-attachments/assets/c0175e7e-861d-43ed-8fc2-02f3661888e5)
+
 
 - А как это будет выглядить? Как этим ботом пользоваться?
 
