@@ -3,7 +3,7 @@ from tokeeen import mytokeen
 import sympy as sp
 import matplotlib
 
-matplotlib.use('Agg')  # Устанавливаем бэкенд для работы без GUI
+matplotlib.use('Agg') 
 import matplotlib.pyplot as plt
 import numpy as np
 
